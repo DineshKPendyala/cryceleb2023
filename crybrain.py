@@ -14,6 +14,37 @@ import speechbrain as sb
 import torch
 from huggingface_hub import hf_hub_download
 
+def download_data_drive(dest="data", drive_folder="/content/drive/MyDrive/huggingface_dataset"):
+    if os.path.exists(os.path.join(dest, "audio", "train")):
+        print(
+            f"It appears that data is already downloaded. \nIf you think it should be re-downloaded, remove {dest}/ directory and re-run"
+        )
+        return
+    
+    # Ensure destination directory exists
+    os.makedirs(dest, exist_ok=True)
+    
+    # Copy files from Google Drive folder
+    for file_name in ["metadata.csv", "audio.zip", "dev_pairs.csv", "test_pairs.csv", "sample_submission.csv"]:
+        src_path = os.path.join(drive_folder, file_name)
+        dest_path = os.path.join(dest, file_name)
+        
+        if os.path.exists(src_path):
+            shutil.copy(src_path, dest_path)
+        else:
+            print(f"Warning: {file_name} not found in Google Drive folder {drive_folder}")
+    
+    # Extract the audio zip file
+    zip_path = os.path.join(dest, "audio.zip")
+    if os.path.exists(zip_path):
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
+            zip_ref.extractall(dest)
+        print(f"Data extracted to {dest}/ directory")
+    else:
+        print("Error: audio.zip not found in the destination directory.")
+
+    print(f"Data is ready in {dest}/ directory")
+
 
 def download_data(dest="data"):
 
